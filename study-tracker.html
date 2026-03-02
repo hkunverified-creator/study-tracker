@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Study Tracker - Sem 3</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --neon-blue: #00d4ff;
+            --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            transition: all 0.4s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 35px 60px rgba(0,0,0,0.4);
+            border-color: var(--neon-blue);
+        }
+        .tab-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .tab-btn.active {
+            background: var(--neon-blue);
+            box-shadow: 0 8px 25px rgba(0,212,255,0.4);
+        }
+        .progress-ring-path {
+            stroke: var(--neon-blue);
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            transition: stroke-dashoffset 1s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-dark py-4">
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-graduation-cap fs-1 me-3 text-info"></i>
+                <h2 class="mb-0 fw-bold">Study Tracker Sem 3</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-info" onclick="exportExcel()">
+                    <i class="fas fa-download me-2"></i>Export Excel
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid px-4 py-5">
+        <!-- Tab Navigation -->
+        <div class="d-flex flex-wrap gap-2 mb-5 justify-content-center">
+            <button class="tab-btn active" onclick="showTab('dashboard')">
+                <i class="fas fa-chart-line me-2"></i>Dashboard
+            </button>
+            <button class="tab-btn" onclick="showTab('tasks')">
+                <i class="fas fa-tasks me-2"></i>Tasks
+            </button>
+            <button class="tab-btn" onclick="showTab('activities')">
+                <i class="fas fa-star me-2"></i>Activities
+            </button>
+            <button class="tab-btn" onclick="showTab('reading')">
+                <i class="fas fa-book me-2"></i>Reading
+            </button>
+            <button class="tab-btn" onclick="showTab('syllabus')">
+                <i class="fas fa-file-alt me-2"></i>Syllabus
+            </button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-3 col-md-6">
+                    <div class="glass-card p-4 text-center h-100">
+                        <svg width="100" height="100" class="mx-auto mb-3">
+                            <circle class="progress-ring-circle" r="45" cx="50" cy="50" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
+                            <circle class="progress-ring-path" r="45" cx="50" cy="50" fill="none" stroke="#00d4ff" stroke-width="8" stroke-linecap="round"/>
+                        </svg>
+                        <h3 class="fw-bold fs-2 mb-1" id="total-tasks">0</h3>
+                        <p class="opacity-75 mb-0">Total Tasks</p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="glass-card p-4 text-center h-100 bg-gradient" style="background: var(--gradient-1);">
+                        <i class="fas fa-star fs-1 mb-3 opacity-75"></i>
+                        <h3 class="fw-bold fs-2 mb-1" id="total-activities">0</h3>
+                        <p class="opacity-75 mb-0">Activities</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tasks Tab -->
+        <div id="tasks" class="tab-content">
+            <div class="glass-card p-5 mb-4">
+                <h3 class="mb-4"><i class="fas fa-plus me-2"></i>Add New Task</h3>
+                <form id="task-form" class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" class="form-control bg-transparent border-info text-white" id="task-title" placeholder="Task title" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" class="form-control bg-transparent border-info text-white" id="task-date" required>
+                    </div>
+                    <div class="col-md-2">
+                        <select class="form-control bg-transparent border-info text-white" id="task-status">
+                            <option>Pending</option>
+                            <option>Completed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="file" class="form-control bg-transparent border-info" id="task-proof" accept="image/*,.pdf">
+                    </div>
+                </form>
+                <button class="btn btn-info mt-3 px-5" onclick="addTask()">
+                    <i class="fas fa-plus me-2"></i>Add Task
+                </button>
+            </div>
+            <div class="glass-card p-4">
+                <h5>All Tasks</h5>
+                <div id="tasks-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Data storage
+        let data = JSON.parse(localStorage.getItem('studyTracker')) || {
+            tasks: [], activities: [], reading: [], syllabus: []
+        };
+
+        // Initialize
+        document.getElementById('task-date').valueAsDate = new Date();
+        updateDashboard();
+        loadTasks();
+
+        // Tab switching
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Add task
+        function addTask() {
+            const task = {
+                id: Date.now(),
+                title: document.getElementById('task-title').value,
+                date: document.getElementById('task-date').value,
+                status: document.getElementById('task-status').value,
+                proof: document.getElementById('task-proof').files[0]
+            };
+            data.tasks.push(task);
+            saveData();
+            updateDashboard();
+            loadTasks();
+            document.getElementById('task-form').reset();
+            document.getElementById('task-date').valueAsDate = new Date();
+        }
+
+        // Load tasks
+        function loadTasks() {
+            const list = document.getElementById('tasks-list');
+            list.innerHTML = data.tasks.map(task => `
+                <div class="d-flex justify-content-between align-items-center p-3 border-bottom">
+                    <div>
+                        <strong>${task.title}</strong><br>
+                        <small>${task.date} | ${task.status}</small>
+                    </div>
+                    ${task.proof ? '<span class="badge bg-success">Proof ✓</span>' : ''}
+                </div>
+            `).join('');
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            document.getElementById('total-tasks').textContent = data.tasks.length;
+            document.getElementById('total-activities').textContent = data.activities.length;
+            
+            // Update progress ring
+            const progress = data.tasks.filter(t => t.status === 'Completed').length / Math.max(1, data.tasks.length) * 100;
+            document.querySelector('.progress-ring-path').style.strokeDashoffset = 314 - (314 * progress / 100);
+        }
+
+        // Save data
+        function saveData() {
+            localStorage.setItem('studyTracker', JSON.stringify(data));
+        }
+
+        // Export Excel (simplified)
+        function exportExcel() {
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Study_Tracker_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        }
+
+        // Tab content visibility
+        document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+        document.getElementById('dashboard').style.display = 'block';
+    </script>
+</body>
+</html>
+ 
